@@ -1,10 +1,10 @@
 
-class OnlyOnce
+class RunOnce
   class << self
     attr_accessor :db_file
     
     def use_path=(path)
-      self.use_file = path + "/only_once.db.#{$$}"
+      self.use_file = path + "/#{self}.db.#{$$}"
     end
     
     def use_file=(file)
@@ -58,7 +58,7 @@ class OnlyOnce
     end
   end
   
-  @db_file = "/tmp/only_once.db.#{$$}"
+  @db_file = "/tmp/#{self}.db.#{$$}"
   
   def initialize(context)
     @context = context
