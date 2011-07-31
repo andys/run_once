@@ -3,8 +3,6 @@ class OnlyOnce
   class << self
     attr_accessor :db_file
     
-    @db_file = "/tmp/only_once.db.#{$$}"
-    
     def use_path=(path)
       self.use_file = path + "/only_once.db.#{$$}"
     end
@@ -59,6 +57,8 @@ class OnlyOnce
       retval
     end
   end
+  
+  @db_file = "/tmp/only_once.db.#{$$}"
   
   def initialize(context)
     @context = context
