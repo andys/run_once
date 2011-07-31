@@ -1,0 +1,47 @@
+
+only_once 
+---------
+
+This gem only lets a code block run once in every N seconds.
+
+For example:
+
+  > loop { OnlyOnce.in(3) { puts Time.now } }
+  2011-07-31 10:29:02 +1000
+  2011-07-31 10:29:05 +1000
+  2011-07-31 10:29:08 +1000
+  ...
+
+
+Usage
+-----
+
+First, gem install 'only_once'.  OnlyOnce uses a text file to keep track of
+the state and puts it in /tmp by default.  The file is locked during update
+so you can safely use it from multiple threads.
+
+  require 'only_once'
+  
+  OnlyOnce.use_file = 'only_once.db'
+  # or
+  OnlyOnce.use_path = '/tmp/'
+
+
+Caller Context
+--------------
+
+OnlyOnce looks at the ruby stack to know where its being called from, so you
+can use it in different places in the same program.
+
+Sometimes you may set the context manually using with_context().  You can
+re-use the same context in different places in your program, for example to
+make sure warning emails of any kind are only sent once every 2 minutes, eg:
+
+  OnlyOnce.with_context('email alert').in(120) { EmailAlert.deliver ... }
+
+
+Contact the author
+------------------
+
+Andrew Snow <andrew@modulus.org>
+Andys^ on irc.freenode.net
