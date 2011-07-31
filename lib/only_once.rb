@@ -3,9 +3,15 @@ class OnlyOnce
   class << self
     attr_accessor :db_file
     
+    @db_file = "/tmp/only_once.db.#{$$}"
+    
     def use_path=(path)
-      self.db_file = path + '/only_once.db'
-      File.open(@db_file, 'a+')
+      self.use_file = path + "/only_once.db.#{$$}"
+    end
+    
+    def use_file=(file)
+      self.db_file = file
+      File.open(@db_file, 'a+') { }
     end
     
     def get_a_context
@@ -21,8 +27,8 @@ class OnlyOnce
     end
     
     def update_db(key, val)
-      formatted_val = '%10s' % val.to_s
-      File.open(@db_file, 'a+') do |io|
+      formatted_val = '%015.3f' % val.to_f
+      File.open(@db_file, 'w+') do |io|
         io.flock(File::LOCK_EX)
         io.rewind
         io.puts key if !search_db(io,key)
@@ -54,25 +60,23 @@ class OnlyOnce
     end
   end
   
-  @db_file = File.dirname(__FILE__) + '/only_once.db'
-  
   def initialize(context)
     @context = context
   end
   
   def in(seconds)
-    if(!last_happened || last_happened && (Time.now.to_i > (last_happened + seconds.to_i)))
+    if(!last_happened || last_happened && (Time.now.to_f > (last_happened + seconds.to_f)))
       update_last_happened
       yield
     end
   end
   
   def last_happened
-    @last_happened ||= (self.class.lookup_db(@context).to_i rescue nil)
+    @last_happened ||= (self.class.lookup_db(@context).to_f rescue nil)
   end
   
   def update_last_happened
-    self.class.update_db(@context, Time.now.to_i)
+    self.class.update_db(@context, Time.now.to_f)
   end
   
 end
